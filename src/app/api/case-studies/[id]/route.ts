@@ -29,7 +29,14 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     if (body.accentColor !== undefined) updates.accentColor = body.accentColor;
     if (body.image !== undefined) updates.image = body.image;
     if (body.is_published !== undefined) updates.is_published = body.is_published;
-    
+    if (body.client !== undefined) updates.client = body.client;
+    if (body.overview !== undefined) updates.overview = body.overview;
+    if (body.role !== undefined) updates.role = body.role;
+    if (body.timeline !== undefined) updates.timeline = body.timeline;
+    if (body.industry !== undefined) updates.industry = body.industry;
+    if (body.challenge !== undefined) updates.challenge = body.challenge;
+    if (body.solution !== undefined) updates.solution = body.solution;
+    if (body.impact !== undefined) updates.impact = body.impact;
     const { data, error } = await supabase
       .from('case_studies')
       .update(updates)

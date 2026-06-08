@@ -32,10 +32,6 @@ export default function JobsManager() {
     experience: "",
   });
 
-  useEffect(() => {
-    fetchJobs();
-  }, []);
-
   const fetchJobs = async () => {
     try {
       const response = await fetch('/api/jobs');
@@ -48,6 +44,11 @@ export default function JobsManager() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchJobs();
+  }, []);
 
   const toggleStatus = async (job: Job) => {
     try {
@@ -155,7 +156,7 @@ export default function JobsManager() {
               {loading ? (
                 <tr><td colSpan={6} className="p-12 text-center text-gray-500">Loading jobs...</td></tr>
               ) : jobs.length === 0 ? (
-                <tr><td colSpan={6} className="p-12 text-center text-gray-500">No job posts found. Click "Add New Job" to create one.</td></tr>
+                <tr><td colSpan={6} className="p-12 text-center text-gray-500">No job posts found. Click &quot;Add New Job&quot; to create one.</td></tr>
               ) : (
                 jobs.map((job) => (
                   <tr key={job.id} className="hover:bg-gray-50 transition-colors group">

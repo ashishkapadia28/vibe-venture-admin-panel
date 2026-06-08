@@ -22,7 +22,7 @@ export default function TrafficChart() {
     <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm w-full h-[400px]">
       <h3 className="text-gray-900 font-medium mb-6">Traffic & Inquiries (Last 30 Days)</h3>
       <div className="w-full h-[300px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <LineChart data={data} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" strokeOpacity={0.8} vertical={false} />
             <XAxis 

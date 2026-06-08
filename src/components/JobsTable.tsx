@@ -18,10 +18,6 @@ export default function JobsTable() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchJobs();
-  }, []);
-
   const fetchJobs = async () => {
     try {
       const response = await fetch('/api/jobs');
@@ -34,6 +30,11 @@ export default function JobsTable() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchJobs();
+  }, []);
 
   const toggleStatus = async (job: Job) => {
     try {
@@ -129,7 +130,7 @@ export default function JobsTable() {
       
       {jobs.length === 0 && (
         <div className="p-12 text-center text-gray-500">
-          No job posts found. Click "Add New Job" to create one.
+          No job posts found. Click &quot;Add New Job&quot; to create one.
         </div>
       )}
     </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { Edit2, Trash2 } from "lucide-react";
@@ -19,6 +20,14 @@ export interface CaseStudy {
   image: string;
   is_published: boolean;
   created_at?: string;
+  client?: string;
+  overview?: string;
+  role?: string;
+  timeline?: number;
+  industry?: string;
+  challenge?: string;
+  solution?: string;
+  impact?: string;
 }
 
 interface CaseStudyTableProps {
@@ -56,6 +65,7 @@ export default function CaseStudyTable({ caseStudies, onEdit, onDelete, isLoadin
                 <td className="px-6 py-4 text-gray-900 font-medium">
                   <div className="flex items-center gap-3">
                     {item.image && (
+                      
                       <img src={item.image} alt={item.title} className="w-10 h-10 rounded-md object-cover border border-gray-200" />
                     )}
                     <span className="truncate max-w-[200px]" title={item.title}>{item.title}</span>

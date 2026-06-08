@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -161,7 +162,7 @@ export default function JobDetailsPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex justify-end items-center gap-3">
-                            <Link href={applicant.linkedin} target="_blank" className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View LinkedIn">
+                            <Link href={applicant.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View LinkedIn">
                               <LinkedinIcon className="w-4 h-4" />
                             </Link>
                             <button onClick={() => setSelectedApplicant(applicant)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Profile">
@@ -231,6 +232,7 @@ export default function JobDetailsPage() {
                 <Link 
                   href={selectedApplicant.linkedin}
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg font-medium transition-colors"
                 >
                   <LinkedinIcon className="w-4 h-4" />

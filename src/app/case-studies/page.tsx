@@ -11,11 +11,8 @@ export default function CaseStudiesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchCaseStudies();
-  }, []);
-
   const fetchCaseStudies = async () => {
+
     try {
       setIsLoading(true);
       const res = await fetch("/api/case-studies");
@@ -28,6 +25,11 @@ export default function CaseStudiesPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchCaseStudies();
+  }, []);
 
   const handleEdit = (study: CaseStudy) => {
     router.push(`/case-studies/${study.id}/edit`);

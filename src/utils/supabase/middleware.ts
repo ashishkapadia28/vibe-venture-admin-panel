@@ -51,11 +51,11 @@ export const updateSession = async (request: NextRequest) => {
   );
 
   if (!user && !isAuthRoute) {
-    if (isApiRoute && request.method !== 'GET' && !isPublicPost) {
+    if (isApiRoute && request.method !== 'GET' && request.method !== 'OPTIONS' && !isPublicPost) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    if (isApiRoute && (request.method === 'GET' || isPublicPost)) {
+    if (isApiRoute && (request.method === 'GET' || request.method === 'OPTIONS' || isPublicPost)) {
       return supabaseResponse;
     }
     

@@ -40,12 +40,22 @@ export const updateSession = async (request: NextRequest) => {
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login');
 
+  // Define public endpoints that allow anonymous POST requests
+  const publicPostRoutes = [
+    '/api/inquiries',
+    '/api/applications',
+    '/api/blogs/comments'
+  ];
+  const isPublicPost = request.method === 'POST' && publicPostRoutes.some(route => 
+    request.nextUrl.pathname.startsWith(route)
+  );
+
   if (!user && !isAuthRoute) {
-    if (isApiRoute && request.method !== 'GET') {
+    if (isApiRoute && request.method !== 'GET' && !isPublicPost) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    if (isApiRoute && request.method === 'GET') {
+    if (isApiRoute && (request.method === 'GET' || isPublicPost)) {
       return supabaseResponse;
     }
     

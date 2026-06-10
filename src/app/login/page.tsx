@@ -1,25 +1,43 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { loginAction, signUpAction } from "./actions";
-import { Loader2, Lock, Mail } from "lucide-react";
+import { Loader2, Lock, Mail, AlertCircle, X } from "lucide-react";
+import { useEffect } from "react";
 
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => setError(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  const router = useRouter();
+
   async function handleSubmit(formData: FormData) {
     setIsLoading(true);
     setError(null);
-    const result = isSignUp 
-      ? await signUpAction(formData)
-      : await loginAction(formData);
     
-    // If we reach here and there's an error, display it.
-    // (If login succeeds, the action redirects so this code might not run)
-    if (result?.error) {
-      setError(result.error);
+    try {
+      const result = isSignUp 
+        ? await signUpAction(formData)
+        : await loginAction(formData);
+      
+      if (result?.error) {
+        setError(result.error);
+        setIsLoading(false);
+      } else if (result?.success) {
+        router.push("/");
+        router.refresh();
+      }
+    } catch (e) {
+      setError("An unexpected error occurred.");
       setIsLoading(false);
     }
   }
@@ -40,8 +58,34 @@ export default function LoginPage() {
         </p>
       </div>
 
+      {/* Toast Notification */}
+      {error && (
+        <div className="fixed top-6 right-6 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="bg-white border border-gray-100 rounded-xl shadow-xl shadow-red-500/10 p-4 min-w-[300px] flex items-start gap-3">
+            <div className="p-2 bg-red-50 rounded-full text-red-500 shrink-0">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <div className="flex-1 pt-0.5">
+              <h3 className="text-sm font-bold text-gray-900">Authentication Error</h3>
+              <p className="text-sm text-gray-600 mt-1">{error}</p>
+            </div>
+            <button onClick={() => setError(null)} className="text-gray-400 hover:text-gray-600 p-1">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="bg-white py-8 px-4 shadow-xl shadow-gray-200/50 sm:rounded-2xl sm:px-10 border border-gray-100">
+          
+          {process.env.NODE_ENV === "development" && (
+            <div className="mb-6 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-start gap-2">
+              <span className="font-bold">Dev Mode:</span>
+              <span>Credentials pre-filled. (ashishkdevs@gmail.com / @Ashu123)</span>
+            </div>
+          )}
+
           <form className="space-y-6" action={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -56,6 +100,7 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
+                  defaultValue={process.env.NODE_ENV === "development" ? "ashishkdevs@gmail.com" : ""}
                   className="appearance-none block w-full pl-10 px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent sm:text-sm transition-shadow"
                   placeholder="admin@vibeventure.com"
                 />
@@ -75,26 +120,12 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   required
+                  defaultValue={process.env.NODE_ENV === "development" ? "@Ashu123" : ""}
                   className="appearance-none block w-full pl-10 px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent sm:text-sm transition-shadow"
                   placeholder="••••••••"
                 />
               </div>
             </div>
-
-            {error && (
-              <div className="rounded-md bg-red-50 p-4 border border-red-100">
-                <div className="flex">
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-800">
-                      Authentication Error
-                    </h3>
-                    <div className="mt-2 text-sm text-red-700">
-                      <p>{error}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div>
               <button

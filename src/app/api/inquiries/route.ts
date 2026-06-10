@@ -4,35 +4,27 @@ import { checkAuth } from "@/utils/api-auth";
 import { verifyTurnstileToken } from "@/utils/turnstile";
 import { z } from "zod";
 
-const applicationSchema = z.object({
-  job_id: z.string().uuid().min(1, "Job ID is required"),
+const inquirySchema = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email").min(1, "Email is required"),
-  phone: z.string().optional().nullable(),
-  linkedin: z.string().optional().nullable(),
-  experience: z.string().optional().nullable(),
-  cover_letter: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
+  industry: z.string().optional().nullable(),
+  service: z.string().optional().nullable(),
+  project_info: z.string().min(1, "Project info is required"),
   cf_turnstile_response: z.string().min(1, "Captcha token is required").optional(),
 });
 
 /**
  * @swagger
- * /api/applications:
+ * /api/inquiries:
  *   get:
  *     tags:
- *       - Applications
- *     summary: Returns a list of applications
- *     description: Returns all applications, optionally filtered by job ID
- *     parameters:
- *       - in: query
- *         name: job_id
- *         required: false
- *         schema:
- *           type: string
- *         description: Filter applications by Job ID
+ *       - Inquiries
+ *     summary: Returns a list of inquiries
+ *     description: Returns all inquiries ordered by creation date descending
  *     responses:
  *       200:
- *         description: A list of applications
+ *         description: A list of inquiries
  *       500:
  *         description: Internal server error
  */
@@ -40,19 +32,13 @@ export async function GET(request: Request) {
   const authError = await checkAuth();
   if (authError) return authError;
 
-  const { searchParams } = new URL(request.url);
-  const jobId = searchParams.get('job_id');
-  
   try {
     const supabase = await createClient();
     
-    let query = supabase.from('job_applications').select('*').order('created_at', { ascending: false });
-    
-    if (jobId) {
-      query = query.eq('job_id', jobId);
-    }
-    
-    const { data, error } = await query;
+    const { data, error } = await supabase
+      .from('inquiries')
+      .select('*')
+      .order('created_at', { ascending: false });
     
     if (error) throw error;
     
@@ -64,12 +50,12 @@ export async function GET(request: Request) {
 
 /**
  * @swagger
- * /api/applications:
+ * /api/inquiries:
  *   post:
  *     tags:
- *       - Applications
- *     summary: Creates a new application
- *     description: Creates a new job application
+ *       - Inquiries
+ *     summary: Creates a new inquiry
+ *     description: Submits a new project inquiry
  *     requestBody:
  *       required: true
  *       content:
@@ -77,37 +63,35 @@ export async function GET(request: Request) {
  *           schema:
  *             type: object
  *             required:
- *               - job_id
  *               - name
  *               - email
+ *               - project_info
  *               - cf_turnstile_response
  *             properties:
- *               job_id:
- *                 type: string
  *               name:
  *                 type: string
  *               email:
  *                 type: string
- *               phone:
+ *               country:
  *                 type: string
- *               linkedin:
+ *               industry:
  *                 type: string
- *               experience:
+ *               service:
  *                 type: string
- *               cover_letter:
+ *               project_info:
  *                 type: string
  *               cf_turnstile_response:
  *                 type: string
  *     responses:
  *       201:
- *         description: The created application
+ *         description: The created inquiry
  *       500:
  *         description: Internal server error
  */
 export async function POST(request: Request) {
   try {
     const json = await request.json();
-    const result = applicationSchema.safeParse(json);
+    const result = inquirySchema.safeParse(json);
     
     if (!result.success) {
       return NextResponse.json({ error: "Validation failed", details: result.error.issues }, { status: 400 });
@@ -128,23 +112,22 @@ export async function POST(request: Request) {
     const supabase = await createClient();
     
     const { data, error } = await supabase
-      .from('job_applications')
+      .from('inquiries')
       .insert([
         {
-          job_id: body.job_id,
           name: body.name,
           email: body.email,
-          phone: body.phone,
-          linkedin: body.linkedin,
-          experience: body.experience,
-          cover_letter: body.cover_letter || null,
-          status: 'In Review', // Default status for new applications
+          country: body.country,
+          industry: body.industry,
+          service: body.service,
+          project_info: body.project_info,
+          status: 'New'
         }
       ]);
       
     if (error) throw error;
     
-    return NextResponse.json({ success: true, message: "Application submitted successfully" }, { status: 201 });
+    return NextResponse.json({ success: true, message: "Inquiry submitted successfully" }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

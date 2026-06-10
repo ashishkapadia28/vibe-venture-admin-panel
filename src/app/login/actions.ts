@@ -23,7 +23,7 @@ export async function loginAction(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  return { success: true };
 }
 
 export async function signUpAction(formData: FormData) {
@@ -57,7 +57,7 @@ export async function signUpAction(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  return { success: true };
 }
 
 export async function logoutAction() {

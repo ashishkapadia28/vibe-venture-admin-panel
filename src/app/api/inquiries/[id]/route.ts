@@ -3,36 +3,30 @@ import { createClient } from "@/utils/supabase/server";
 import { checkAuth } from "@/utils/api-auth";
 import { z } from "zod";
 
-const jobUpdateSchema = z.object({
-  title: z.string().optional(),
-  department: z.string().optional().nullable(),
-  location: z.string().optional().nullable(),
-  type: z.string().optional().nullable(),
-  experience: z.string().optional().nullable(),
-  is_active: z.boolean().optional(),
-  description: z.string().optional().nullable(),
+const inquiryUpdateSchema = z.object({
+  status: z.string().min(1, "Status is required"),
 });
 
 /**
  * @swagger
- * /api/jobs/{id}:
+ * /api/inquiries/{id}:
  *   get:
  *     tags:
- *       - Jobs
- *     summary: Get a job by ID
- *     description: Returns a single job posting based on the provided ID
+ *       - Inquiries
+ *     summary: Get an inquiry by ID
+ *     description: Returns a single inquiry based on the provided ID
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: The job ID
+ *         description: The inquiry ID
  *     responses:
  *       200:
- *         description: The requested job
+ *         description: The requested inquiry
  *       404:
- *         description: Job not found
+ *         description: Inquiry not found
  *       500:
  *         description: Internal server error
  */
@@ -40,12 +34,15 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authError = await checkAuth();
+  if (authError) return authError;
+
   try {
     const { id } = await params;
     const supabase = await createClient();
     
     const { data, error } = await supabase
-      .from('job_posts')
+      .from('inquiries')
       .select('*')
       .eq('id', id)
       .single();
@@ -60,19 +57,19 @@ export async function GET(
 
 /**
  * @swagger
- * /api/jobs/{id}:
+ * /api/inquiries/{id}:
  *   put:
  *     tags:
- *       - Jobs
- *     summary: Update a job
- *     description: Updates an existing job posting by ID
+ *       - Inquiries
+ *     summary: Update an inquiry status
+ *     description: Updates an existing inquiry status
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: The job ID
+ *         description: The inquiry ID
  *     requestBody:
  *       required: true
  *       content:
@@ -80,23 +77,11 @@ export async function GET(
  *           schema:
  *             type: object
  *             properties:
- *               title:
- *                 type: string
- *               department:
- *                 type: string
- *               location:
- *                 type: string
- *               type:
- *                 type: string
- *               experience:
- *                 type: string
- *               is_active:
- *                 type: boolean
- *               description:
+ *               status:
  *                 type: string
  *     responses:
  *       200:
- *         description: The updated job
+ *         description: The updated inquiry
  *       500:
  *         description: Internal server error
  */
@@ -110,7 +95,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const json = await request.json();
-    const result = jobUpdateSchema.safeParse(json);
+    const result = inquiryUpdateSchema.safeParse(json);
     
     if (!result.success) {
       return NextResponse.json({ error: "Validation failed", details: result.error.issues }, { status: 400 });
@@ -119,15 +104,9 @@ export async function PUT(
     const supabase = await createClient();
     
     const { data, error } = await supabase
-      .from('job_posts')
+      .from('inquiries')
       .update({
-        title: body.title,
-        department: body.department,
-        location: body.location,
-        type: body.type,
-        experience: body.experience,
-        is_active: body.is_active,
-        description: body.description,
+        status: body.status,
       })
       .eq('id', id)
       .select();
@@ -142,19 +121,19 @@ export async function PUT(
 
 /**
  * @swagger
- * /api/jobs/{id}:
+ * /api/inquiries/{id}:
  *   delete:
  *     tags:
- *       - Jobs
- *     summary: Delete a job
- *     description: Deletes an existing job posting by ID
+ *       - Inquiries
+ *     summary: Delete an inquiry
+ *     description: Deletes an existing inquiry by ID
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: The job ID
+ *         description: The inquiry ID
  *     responses:
  *       200:
  *         description: Successfully deleted
@@ -173,7 +152,7 @@ export async function DELETE(
     const supabase = await createClient();
     
     const { error } = await supabase
-      .from('job_posts')
+      .from('inquiries')
       .delete()
       .eq('id', id);
       

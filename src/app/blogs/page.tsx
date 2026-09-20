@@ -35,8 +35,8 @@ export default async function BlogsPage() {
   const { data: industries } = await supabase.from('industries').select('id, name');
 
   return (
-    <div className="flex-1 p-4 sm:p-8 overflow-y-auto bg-gray-50/50">
-      <BlogsManager 
+    <div className="flex-1 p-4 sm:p-8 overflow-y-auto">
+      <BlogsManager
         initialBlogs={blogs || []} 
         authors={authors || []}
         industries={industries || []}

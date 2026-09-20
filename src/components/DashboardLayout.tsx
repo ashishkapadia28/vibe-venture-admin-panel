@@ -28,7 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Sidebar onClose={() => setIsSidebarOpen(false)} />
       </div>
 
-      <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-gray-50/50 w-full">
+      <main className="flex-1 flex flex-col h-full overflow-hidden relative bg-gradient-to-br from-violet-50/50 via-white to-violet-50/50 w-full">
         <Topbar onMenuClick={() => setIsSidebarOpen(true)} />
         {children}
       </main>

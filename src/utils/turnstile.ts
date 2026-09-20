@@ -1,27 +1,42 @@
-export async function verifyTurnstileToken(token: string) {
-  const secretKey = process.env.TURNSTILE_SECRET_KEY;
-  if (!secretKey) {
-    console.warn("TURNSTILE_SECRET_KEY is not defined. Skipping verification.");
-    return true; // Skip if not configured
+/**
+ * Cloudflare Turnstile server-side verification. Keys already exist in
+ * this project's env (added for the Inquiries form, currently unused —
+ * this reconnects them for the careers application form).
+ *
+ * Fails open only on our own network/config trouble (no secret configured,
+ * or Cloudflare's endpoint unreachable) — never let Turnstile's own outage
+ * take down real applications. Fails closed on a missing or rejected
+ * token, which is the actual spam check doing its job.
+ */
+export async function verifyTurnstile(token: string | null, remoteIp: string | null): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) {
+    console.warn("[turnstile] TURNSTILE_SECRET_KEY not set — verification is disabled.");
+    return true;
   }
 
-  try {
-    const formData = new FormData();
-    formData.append('secret', secretKey);
-    formData.append('response', token);
+  if (!token) return false;
 
-    const result = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      body: formData,
-      method: 'POST',
+  try {
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        secret,
+        response: token,
+        ...(remoteIp ? { remoteip: remoteIp } : {}),
+      }),
     });
 
-    const outcome = await result.json();
-    if (!outcome.success) {
-      console.error("Turnstile verification failed:", outcome['error-codes']);
+    if (!res.ok) {
+      console.error("[turnstile] siteverify request failed with status", res.status);
+      return true; // Cloudflare having a bad day shouldn't block real applicants
     }
-    return outcome.success;
-  } catch (error) {
-    console.error("Error verifying Turnstile token:", error);
-    return false;
+
+    const data = await res.json();
+    return data.success === true;
+  } catch (err) {
+    console.error("[turnstile] siteverify request errored:", err);
+    return true;
   }
 }

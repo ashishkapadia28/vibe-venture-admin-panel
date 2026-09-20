@@ -15,12 +15,12 @@ const PREDEFINED_THEMES = [
   { name: 'Amber', gradient: 'from-amber-500/10 via-yellow-500/5 to-transparent', accentColor: 'text-amber-500', hex: '#f59e0b' },
   { name: 'Yellow', gradient: 'from-yellow-500/10 via-amber-500/5 to-transparent', accentColor: 'text-yellow-500', hex: '#eab308' },
   { name: 'Lime', gradient: 'from-lime-500/10 via-green-500/5 to-transparent', accentColor: 'text-lime-500', hex: '#84cc16' },
-  { name: 'Green', gradient: 'from-green-500/10 via-emerald-500/5 to-transparent', accentColor: 'text-green-500', hex: '#22c55e' },
-  { name: 'Emerald', gradient: 'from-emerald-500/10 via-teal-500/5 to-transparent', accentColor: 'text-emerald-500', hex: '#10b981' },
+  { name: 'Green', gradient: 'from-green-500/10 via-violet-500/5 to-transparent', accentColor: 'text-green-500', hex: '#22c55e' },
+  { name: 'Emerald', gradient: 'from-violet-500/10 via-teal-500/5 to-transparent', accentColor: 'text-violet-500', hex: '#10b981' },
   { name: 'Teal', gradient: 'from-teal-500/10 via-cyan-500/5 to-transparent', accentColor: 'text-teal-500', hex: '#14b8a6' },
   { name: 'Cyan', gradient: 'from-cyan-500/10 via-sky-500/5 to-transparent', accentColor: 'text-cyan-500', hex: '#06b6d4' },
-  { name: 'Sky', gradient: 'from-sky-500/10 via-blue-500/5 to-transparent', accentColor: 'text-sky-500', hex: '#0ea5e9' },
-  { name: 'Blue', gradient: 'from-blue-500/10 via-indigo-500/5 to-transparent', accentColor: 'text-blue-500', hex: '#3b82f6' },
+  { name: 'Sky', gradient: 'from-sky-500/10 via-violet-500/5 to-transparent', accentColor: 'text-sky-500', hex: '#0ea5e9' },
+  { name: 'Blue', gradient: 'from-violet-500/10 via-indigo-500/5 to-transparent', accentColor: 'text-violet-500', hex: '#3b82f6' },
   { name: 'Indigo', gradient: 'from-indigo-500/10 via-violet-500/5 to-transparent', accentColor: 'text-indigo-500', hex: '#6366f1' },
   { name: 'Violet', gradient: 'from-violet-500/10 via-purple-500/5 to-transparent', accentColor: 'text-violet-500', hex: '#8b5cf6' },
   { name: 'Purple', gradient: 'from-purple-500/10 via-fuchsia-500/5 to-transparent', accentColor: 'text-purple-500', hex: '#a855f7' },
@@ -83,8 +83,8 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
     challenge: initialData?.challenge || "",
     solution: initialData?.solution || "",
     impact: initialData?.impact || "",
-    gradient: initialData?.gradient || "from-emerald-500/10 via-teal-500/5 to-transparent",
-    accentColor: initialData?.accentColor || "text-emerald-500",
+    gradient: initialData?.gradient || "from-violet-500/10 via-teal-500/5 to-transparent",
+    accentColor: initialData?.accentColor || "text-violet-500",
     image: initialData?.image || "",
     is_published: initialData?.is_published ?? true,
   });
@@ -250,7 +250,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
   };
 
   return (
-    <div className="flex-1 p-8 overflow-y-auto bg-gray-50/50">
+    <div className="flex-1 p-8 overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-8">
         <header>
           <Link href="/case-studies" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors mb-4">
@@ -265,7 +265,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
           </p>
         </header>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+        <form onSubmit={handleSubmit} className="panel flex flex-col">
           {/* Tabs Navigation */}
           <div className="flex border-b border-gray-200 overflow-x-auto bg-gray-50/80">
             {[
@@ -280,11 +280,11 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-6 py-4 text-sm font-medium whitespace-nowrap transition-colors border-b-2 outline-none ${
                   activeTab === tab.id
-                    ? "border-blue-600 text-blue-600 bg-white"
+                    ? "border-violet-600 text-violet-600 bg-white"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
                 }`}
               >
-                <span className={`mr-2 px-2 py-0.5 rounded-full text-xs ${activeTab === tab.id ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-500'}`}>{idx + 1}</span>
+                <span className={`mr-2 px-2 py-0.5 rounded-full text-xs ${activeTab === tab.id ? 'bg-violet-100 text-violet-600' : 'bg-gray-200 text-gray-500'}`}>{idx + 1}</span>
                 {tab.label}
               </button>
             ))}
@@ -301,7 +301,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                       type="text" 
                       value={formData.title} 
                       onChange={e => setFormData({...formData, title: e.target.value})} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-shadow" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none transition-shadow" 
                       placeholder="e.g. Fintech Nexus" 
                     />
                   </div>
@@ -312,7 +312,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                       type="text" 
                       value={formData.tag} 
                       onChange={e => setFormData({...formData, tag: e.target.value})} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-shadow" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none transition-shadow" 
                       placeholder="e.g. SaaS Platform" 
                     />
                   </div>
@@ -325,7 +325,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                     rows={4}
                     value={formData.description} 
                     onChange={e => setFormData({...formData, description: e.target.value})} 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none transition-shadow" 
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none resize-none transition-shadow" 
                     placeholder="Short description for the case study card..." 
                   />
                 </div>
@@ -341,7 +341,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                       type="text" 
                       value={formData.industry} 
                       onChange={e => setFormData({...formData, industry: e.target.value})} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-shadow" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none transition-shadow" 
                       placeholder="e.g. Global Finance" 
                     />
                   </div>
@@ -351,7 +351,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                       type="text" 
                       value={formData.role} 
                       onChange={e => setFormData({...formData, role: e.target.value})} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-shadow" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none transition-shadow" 
                       placeholder="e.g. Core Architecture" 
                     />
                   </div>
@@ -361,7 +361,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                       type="number" 
                       value={formData.timeline} 
                       onChange={e => setFormData({...formData, timeline: e.target.value})} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-shadow" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none transition-shadow" 
                       placeholder="e.g. 8" 
                     />
                   </div>
@@ -374,7 +374,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                       rows={4}
                       value={formData.overview} 
                       onChange={e => setFormData({...formData, overview: e.target.value})} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none transition-shadow" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none resize-none transition-shadow" 
                       placeholder="Detailed project overview..." 
                     />
                   </div>
@@ -384,7 +384,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                       rows={4}
                       value={formData.challenge} 
                       onChange={e => setFormData({...formData, challenge: e.target.value})} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none transition-shadow" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none resize-none transition-shadow" 
                       placeholder="What was the challenge?..." 
                     />
                   </div>
@@ -394,7 +394,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                       rows={4}
                       value={formData.solution} 
                       onChange={e => setFormData({...formData, solution: e.target.value})} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none transition-shadow" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none resize-none transition-shadow" 
                       placeholder="How did you solve it?..." 
                     />
                   </div>
@@ -404,7 +404,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                       rows={4}
                       value={formData.impact} 
                       onChange={e => setFormData({...formData, impact: e.target.value})} 
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none resize-none transition-shadow" 
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none resize-none transition-shadow" 
                       placeholder="What was the final impact?..." 
                     />
                   </div>
@@ -421,7 +421,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                     <div className="space-y-2 text-center relative z-10 bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-gray-100 shadow-sm transition-all group-hover:bg-white">
                       {isConverting ? (
                         <div className="flex flex-col items-center gap-2">
-                          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                          <Loader2 className="w-8 h-8 text-violet-600 animate-spin" />
                           <p className="text-sm text-gray-500 font-medium">Optimizing image (WebP)...</p>
                         </div>
                       ) : (
@@ -433,7 +433,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
 <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                               </div>
                             ) : (
-                              <div className="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
+                              <div className="w-16 h-16 bg-violet-50 text-violet-500 rounded-full flex items-center justify-center">
                                 <ImageIcon className="w-8 h-8" />
                               </div>
                             )}
@@ -441,7 +441,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                           <div className="flex text-sm text-gray-600 justify-center">
                             <label
                               htmlFor="file-upload"
-                              className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                              className="relative cursor-pointer bg-white rounded-md font-medium text-violet-600 hover:text-violet-500 focus-within:outline-none"
                             >
                               <span>{imagePreview ? "Change Image" : "Upload an image"}</span>
                               <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleImageChange} />
@@ -475,7 +475,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                         }));
                       }
                     }}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-shadow bg-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none transition-shadow bg-white"
                   >
                     {PREDEFINED_THEMES.map(theme => (
                       <option key={theme.name} value={theme.name}>
@@ -488,13 +488,13 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3 p-4 bg-blue-50/50 rounded-lg border border-blue-100 mt-4">
+                <div className="flex items-center gap-3 p-4 bg-violet-50/50 rounded-lg border border-violet-100 mt-4">
                   <input 
                     type="checkbox" 
                     id="is_published"
                     checked={formData.is_published}
                     onChange={e => setFormData({...formData, is_published: e.target.checked})}
-                    className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-600"
+                    className="w-5 h-5 text-violet-600 rounded border-gray-300 focus:ring-violet-600"
                   />
                   <label htmlFor="is_published" className="text-sm font-medium text-gray-900 cursor-pointer select-none">
                     Published (Visible on main website)
@@ -512,7 +512,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                     type="text" 
                     value={techStack} 
                     onChange={e => setTechStack(e.target.value)} 
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-shadow" 
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none transition-shadow" 
                     placeholder="Node.js, Kafka, PostgreSQL..." 
                   />
                 </div>
@@ -528,7 +528,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                             type="text" 
                             value={metric.label} 
                             onChange={e => handleMetricChange(index, 'label', e.target.value)} 
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm" 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none text-sm" 
                             placeholder="e.g. Adoption" 
                           />
                         </div>
@@ -538,7 +538,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                             type="text" 
                             value={metric.value} 
                             onChange={e => handleMetricChange(index, 'value', e.target.value)} 
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none text-sm font-bold" 
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-violet-600 focus:border-transparent outline-none text-sm font-bold" 
                             placeholder="e.g. 50k+" 
                           />
                         </div>
@@ -559,7 +559,7 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                     const tabs = ['basic', 'details', 'media', 'metrics'];
                     setActiveTab(tabs[tabs.indexOf(activeTab) - 1]);
                   }}
-                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+                  className="btn btn-secondary"
                 >
                   <ChevronLeft className="w-4 h-4" /> Previous
                 </button>
@@ -571,24 +571,24 @@ export default function CaseStudyForm({ initialData, isEdit = false }: CaseStudy
                     const tabs = ['basic', 'details', 'media', 'metrics'];
                     setActiveTab(tabs[tabs.indexOf(activeTab) + 1]);
                   }}
-                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2"
+                  className="btn btn-secondary"
                 >
                   Next <ChevronRight className="w-4 h-4" />
                 </button>
               )}
             </div>
-            
+
             <div className="flex gap-4">
-              <Link 
+              <Link
                 href="/case-studies"
-                className="px-6 py-2.5 text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg font-medium transition-colors shadow-sm"
+                className="btn btn-secondary"
               >
                 Cancel
               </Link>
-              <button 
+              <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="btn btn-primary"
               >
                 {isSubmitting ? "Saving..." : (isEdit ? "Save Changes" : "Create Case Study")}
               </button>

@@ -102,9 +102,9 @@ export default function NotificationsDropdown() {
     switch (type) {
       case 'inquiry':
       case 'query':
-        return <Mail className="w-4 h-4 text-blue-600" />;
+        return <Mail className="w-4 h-4 text-violet-600" />;
       case 'comment':
-        return <MessageSquare className="w-4 h-4 text-emerald-600" />;
+        return <MessageSquare className="w-4 h-4 text-violet-600" />;
       case 'job':
         return <Briefcase className="w-4 h-4 text-purple-600" />;
       default:
@@ -131,7 +131,7 @@ export default function NotificationsDropdown() {
       {/* Bell Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2 rounded-full transition-colors ${isOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
+        className={`relative p-2 rounded-full transition-colors ${isOpen ? 'bg-violet-50 text-violet-600' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
       >
         <Bell className="w-5 h-5" />
         {hasUnread && (
@@ -141,13 +141,13 @@ export default function NotificationsDropdown() {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-gray-100 rounded-xl shadow-xl shadow-gray-200/50 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white border border-gray-100 rounded-2xl shadow-xl shadow-violet-900/10 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-gray-50/50">
             <h3 className="font-bold text-gray-900">Notifications</h3>
             {hasUnread && (
               <button 
                 onClick={markAllAsRead}
-                className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
+                className="text-xs font-medium text-violet-600 hover:text-violet-700 flex items-center gap-1 transition-colors"
               >
                 <Check className="w-3 h-3" />
                 Mark all read
@@ -166,7 +166,7 @@ export default function NotificationsDropdown() {
                   <div 
                     key={notification.id}
                     onClick={() => !notification.read_status && markAsRead(notification.id)}
-                    className={`p-4 transition-colors cursor-pointer hover:bg-gray-50 ${!notification.read_status ? 'bg-blue-50/50' : ''}`}
+                    className={`p-4 transition-colors cursor-pointer hover:bg-gray-50 ${!notification.read_status ? 'bg-violet-50/50' : ''}`}
                   >
                     <div className="flex gap-3 items-start">
                       <div className={`p-2 rounded-full shrink-0 ${!notification.read_status ? 'bg-white shadow-sm' : 'bg-gray-100'}`}>
@@ -186,7 +186,7 @@ export default function NotificationsDropdown() {
                         </p>
                       </div>
                       {!notification.read_status && (
-                        <div className="w-2 h-2 bg-blue-600 rounded-full shrink-0 mt-1.5" />
+                        <div className="w-2 h-2 bg-violet-600 rounded-full shrink-0 mt-1.5" />
                       )}
                     </div>
                   </div>

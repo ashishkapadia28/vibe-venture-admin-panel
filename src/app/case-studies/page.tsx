@@ -54,9 +54,9 @@ export default function CaseStudiesPage() {
             <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Case Studies</h1>
             <p className="text-gray-500">Manage your portfolio items and project highlights.</p>
           </div>
-          <Link 
+          <Link
             href="/case-studies/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm"
+            className="btn btn-primary"
           >
             <Plus className="w-5 h-5" />
             Add New Case Study

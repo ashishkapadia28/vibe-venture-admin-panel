@@ -46,8 +46,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative overflow-hidden">
       
       {/* Background Decor */}
-      <div className="absolute top-0 inset-x-0 h-64 bg-linear-to-br from-blue-600/10 via-teal-500/5 to-transparent pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none" />
+      <div className="absolute top-0 inset-x-0 h-64 bg-linear-to-br from-violet-600/10 via-teal-500/5 to-transparent pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-violet-50 rounded-full blur-3xl opacity-50 pointer-events-none" />
 
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 tracking-tight">
@@ -101,7 +101,7 @@ export default function LoginPage() {
                   autoComplete="email"
                   required
                   defaultValue={process.env.NODE_ENV === "development" ? "ashishkdevs@gmail.com" : ""}
-                  className="appearance-none block w-full pl-10 px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent sm:text-sm transition-shadow"
+                  className="input-field pl-10 shadow-sm sm:text-sm"
                   placeholder="admin@vibeventure.com"
                 />
               </div>
@@ -121,7 +121,7 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   required
                   defaultValue={process.env.NODE_ENV === "development" ? "@Ashu123" : ""}
-                  className="appearance-none block w-full pl-10 px-3 py-3 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent sm:text-sm transition-shadow"
+                  className="input-field pl-10 shadow-sm sm:text-sm"
                   placeholder="••••••••"
                 />
               </div>
@@ -131,7 +131,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+                className="btn btn-primary w-full py-3"
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -160,7 +160,7 @@ export default function LoginPage() {
                   setIsSignUp(!isSignUp);
                   setError(null);
                 }}
-                className="w-full flex justify-center py-2 px-4 border border-blue-600 rounded-lg shadow-sm text-sm font-medium text-blue-600 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                className="w-full flex justify-center py-2 px-4 border border-violet-600 rounded-lg shadow-sm text-sm font-medium text-violet-600 bg-white hover:bg-violet-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 transition-colors"
               >
                 {isSignUp ? "Sign in instead" : "Create an account"}
               </button>

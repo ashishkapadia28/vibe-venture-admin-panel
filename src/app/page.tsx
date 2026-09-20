@@ -1,4 +1,4 @@
-import { Wrench, Briefcase, PenTool, Mail } from "lucide-react";
+import { Wrench, Briefcase, PenTool, Mail, Sparkles } from "lucide-react";
 import StatCard from "@/components/StatCard";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -84,9 +84,14 @@ export default async function Home() {
   return (
     <div className="flex-1 p-8 overflow-y-auto">
       <div className="max-w-7xl mx-auto space-y-8">
-        <header>
-          <h1 className="text-[28px] font-bold text-gray-900 tracking-tight mb-1">Dashboard Overview</h1>
-          <p className="text-gray-500 text-sm">Welcome to the Vibe Venture Admin Panel.</p>
+        <header className="bg-gradient-to-r from-violet-600 to-violet-900 rounded-3xl p-8 sm:p-10 text-white shadow-lg relative overflow-hidden">
+          <div className="relative z-10">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-3 text-white">Welcome back, Admin! <span className="inline-block hover:animate-bounce">👋</span></h1>
+            <p className="text-violet-100/90 text-sm sm:text-base max-w-lg leading-relaxed">Here's what's happening with Vibe Venture today. Monitor your portfolio, blogs, and new inquiries all in one place.</p>
+          </div>
+          <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-1/4 -translate-y-1/4">
+            <Sparkles className="w-64 h-64" />
+          </div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -116,26 +121,35 @@ export default async function Home() {
           />
         </div>
 
-        <div className="pt-4">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-6 tracking-tight">Recent Activity</h2>
+        <div className="pt-2">
+          <div className="bg-white/80 backdrop-blur-md rounded-3xl border border-white/60 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.03)] p-6 sm:p-8 relative">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Recent Activity</h2>
+              <span className="text-xs font-semibold px-3 py-1 bg-violet-50 text-violet-600 rounded-full border border-violet-100">Live Updates</span>
+            </div>
             
-            <div className="space-y-6">
+            <div className="space-y-4">
               {recentActivities.length === 0 ? (
-                <p className="text-sm text-gray-500 py-4">No recent activity yet.</p>
+                <div className="text-center py-12">
+                  <p className="text-sm text-gray-500 bg-gray-50 inline-block px-4 py-2 rounded-full">No recent activity yet.</p>
+                </div>
               ) : (
                 recentActivities.map((item) => (
-                  <div key={item.id} className="flex items-start gap-4 pb-6 border-b border-gray-50 last:border-0 last:pb-0">
-                    <div className={`w-10 h-10 rounded-full font-bold flex items-center justify-center shrink-0 ${
-                      item.type === 'blog' ? 'bg-purple-50 text-purple-600' :
-                      item.type === 'portfolio' ? 'bg-emerald-50 text-emerald-600' :
-                      'bg-blue-50 text-blue-600'
+                  <div key={item.id} className="flex items-start gap-4 p-4 rounded-2xl hover:bg-white transition-all duration-300 border border-transparent hover:border-gray-100 hover:shadow-sm group">
+                    <div className={`w-12 h-12 rounded-xl font-bold flex items-center justify-center shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-105 ${
+                      item.type === 'blog' ? 'bg-gradient-to-br from-purple-100 to-purple-50 text-purple-600' :
+                      item.type === 'portfolio' ? 'bg-gradient-to-br from-violet-100 to-violet-50 text-violet-600' :
+                      'bg-gradient-to-br from-indigo-100 to-indigo-50 text-indigo-600'
                     }`}>
                       {item.initials}
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{item.title}</p>
-                      <p className="text-xs text-gray-500 mt-1">{timeAgo(item.created_at)} • {item.subtitle}</p>
+                    <div className="flex-1 pt-1">
+                      <p className="text-[15px] font-semibold text-gray-900 group-hover:text-violet-700 transition-colors">{item.title}</p>
+                      <p className="text-sm text-gray-500 mt-1 flex items-center gap-2">
+                        <span className="font-medium text-gray-400">{timeAgo(item.created_at)}</span> 
+                        <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                        {item.subtitle}
+                      </p>
                     </div>
                   </div>
                 ))

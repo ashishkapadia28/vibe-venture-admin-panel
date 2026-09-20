@@ -102,14 +102,29 @@ export async function DELETE(
   try {
     const { id } = await params;
     const supabase = await createClient();
-    
+
+    // Look up the stored files first so we can clean them out of the
+    // private "resumes" bucket — otherwise they'd be orphaned forever.
+    const { data: existing } = await supabase
+      .from('job_applications')
+      .select('resume_path, cover_letter_path')
+      .eq('id', id)
+      .maybeSingle();
+
     const { error } = await supabase
       .from('job_applications')
       .delete()
       .eq('id', id);
-      
+
     if (error) throw error;
-    
+
+    const pathsToRemove = [existing?.resume_path, existing?.cover_letter_path].filter(
+      (p): p is string => !!p
+    );
+    if (pathsToRemove.length > 0) {
+      await supabase.storage.from('resumes').remove(pathsToRemove);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

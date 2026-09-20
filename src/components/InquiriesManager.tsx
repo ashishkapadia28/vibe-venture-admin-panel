@@ -68,23 +68,23 @@ export default function InquiriesManager() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <MessageSquare className="w-6 h-6 text-blue-600" />
+            <MessageSquare className="w-6 h-6 text-violet-600" />
             Inquiries
           </h2>
           <p className="text-gray-500 mt-1">Manage project inquiries from your website visitors.</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="panel">
         {isLoading ? (
-          <div className="p-12 text-center text-gray-500">Loading inquiries...</div>
+          <div className="empty-state">Loading inquiries...</div>
         ) : inquiries.length === 0 ? (
-          <div className="p-12 text-center text-gray-500">No inquiries found.</div>
+          <div className="empty-state">No inquiries found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-gray-200 bg-gray-50 text-gray-500 text-sm tracking-wider uppercase">
+                <tr className="thead-row">
                   <th className="px-6 py-4 font-medium">Name</th>
                   <th className="px-6 py-4 font-medium">Email</th>
                   <th className="px-6 py-4 font-medium">Date</th>
@@ -92,18 +92,18 @@ export default function InquiriesManager() {
                   <th className="px-6 py-4 font-medium text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-100">
                 {inquiries.map((inq) => (
-                  <tr key={inq.id} className="hover:bg-gray-50 transition-colors group">
+                  <tr key={inq.id} className="hover:bg-violet-50/30 transition-colors group">
                     <td className="px-6 py-4 text-gray-900 font-medium">{inq.name}</td>
                     <td className="px-6 py-4 text-gray-600">
-                      <a href={`mailto:${inq.email}`} className="text-blue-600 hover:underline">
+                      <a href={`mailto:${inq.email}`} className="text-violet-600 hover:underline">
                         {inq.email}
                       </a>
                     </td>
                     <td className="px-6 py-4 text-gray-500">{formatDate(inq.created_at)}</td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 text-xs rounded-full font-medium ${inq.status === 'New' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`badge ${inq.status === 'New' ? 'badge-primary' : 'badge-neutral'}`}>
                         {inq.status || "New"}
                       </span>
                     </td>
@@ -111,14 +111,14 @@ export default function InquiriesManager() {
                       <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => setSelectedInquiry(inq)}
-                          className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                          className="icon-btn"
                           title="View Details"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(inq.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="icon-btn-danger"
                           title="Delete Inquiry"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -135,8 +135,8 @@ export default function InquiriesManager() {
 
       {/* View Details Modal */}
       {selectedInquiry && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/55 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="modal-panel w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 Inquiry Details
@@ -159,7 +159,7 @@ export default function InquiriesManager() {
                   <p className="text-sm text-gray-500 mb-1 flex items-center gap-1">
                     <Mail className="w-4 h-4" /> Email
                   </p>
-                  <a href={`mailto:${selectedInquiry.email}`} className="font-medium text-blue-600 hover:underline">
+                  <a href={`mailto:${selectedInquiry.email}`} className="font-medium text-violet-600 hover:underline">
                     {selectedInquiry.email}
                   </a>
                 </div>
@@ -200,7 +200,7 @@ export default function InquiriesManager() {
             <div className="p-6 border-t border-gray-100 flex justify-end">
               <a 
                 href={`mailto:${selectedInquiry.email}`}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2"
+                className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2"
               >
                 <Mail className="w-4 h-4" />
                 Reply via Email

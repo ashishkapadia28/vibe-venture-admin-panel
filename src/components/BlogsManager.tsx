@@ -182,9 +182,9 @@ export default function BlogsManager({
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Blog Posts</h1>
           <p className="text-gray-500">Manage your company news and industry insights.</p>
         </div>
-        <button 
+        <button
           onClick={openAddModal}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm whitespace-nowrap"
+          className="btn btn-primary whitespace-nowrap"
         >
           <Plus className="w-5 h-5" />
           Create New Post
@@ -194,21 +194,21 @@ export default function BlogsManager({
       {/* Search Bar */}
       <div className="relative max-w-md">
         <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-        <input 
+        <input
           type="text"
           placeholder="Search blog posts..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+          className="input-field pl-10"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="panel hover-lift">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50 text-gray-500 text-sm tracking-wider uppercase">
+              <tr className="thead-row">
                 <th className="px-6 py-4 font-medium w-16">Image</th>
                 <th className="px-6 py-4 font-medium">Post Details</th>
                 <th className="px-6 py-4 font-medium">Author & Category</th>
@@ -216,12 +216,12 @@ export default function BlogsManager({
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-100">
               {filteredBlogs.length === 0 ? (
-                <tr><td colSpan={5} className="p-12 text-center text-gray-500">No blogs found.</td></tr>
+                <tr><td colSpan={5} className="empty-state">No blogs found.</td></tr>
               ) : (
                 filteredBlogs.map((blog) => (
-                  <tr key={blog.id} className="hover:bg-gray-50 transition-colors group">
+                  <tr key={blog.id} className="hover:bg-violet-50/30 transition-colors group">
                     <td className="px-6 py-4">
                       {blog.image_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -241,19 +241,19 @@ export default function BlogsManager({
                       <p className="text-xs text-gray-500 mt-1">{blog.industry?.name || "Uncategorized"}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 text-xs rounded-full font-medium ${blog.is_published ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                      <span className={`badge ${blog.is_published ? "badge-primary" : "badge-warning"}`}>
                         {blog.is_published ? "Published" : "Draft"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => togglePublish(blog)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title={blog.is_published ? "Unpublish" : "Publish"}>
+                        <button onClick={() => togglePublish(blog)} className="icon-btn" title={blog.is_published ? "Unpublish" : "Publish"}>
                           {blog.is_published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
-                        <button onClick={() => openEditModal(blog)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit Blog">
+                        <button onClick={() => openEditModal(blog)} className="icon-btn" title="Edit Blog">
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        <button onClick={() => deleteBlog(blog.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Blog">
+                        <button onClick={() => deleteBlog(blog.id)} className="icon-btn-danger" title="Delete Blog">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -268,8 +268,8 @@ export default function BlogsManager({
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl p-6 relative flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+        <div className="modal-overlay">
+          <div className="modal-panel w-full max-w-4xl p-6 relative flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
             <button onClick={() => setIsModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
               <X className="w-5 h-5" />
             </button>
@@ -279,15 +279,15 @@ export default function BlogsManager({
               <div className="overflow-y-auto pr-2 space-y-6 flex-1 custom-scrollbar pb-6">
                 
                 {/* Banner Upload */}
-                <div className="relative w-full h-48 sm:h-64 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50 group hover:border-blue-500 transition-colors">
+                <div className="relative w-full h-48 sm:h-64 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden bg-gray-50 group hover:border-violet-500 transition-colors">
                   {isUploading ? (
-                    <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+                    <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
                   ) : formData.image_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={formData.image_url} alt="Cover Preview" className="w-full h-full object-cover" />
                   ) : (
                     <div className="flex flex-col items-center">
-                      <ImageIcon className="w-10 h-10 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                      <ImageIcon className="w-10 h-10 text-gray-400 group-hover:text-violet-500 transition-colors" />
                       <span className="text-sm text-gray-500 mt-2 font-medium">Upload Cover Image (Max 2MB)</span>
                     </div>
                   )}
@@ -297,25 +297,25 @@ export default function BlogsManager({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                    <input required type="text" value={formData.title} onChange={handleTitleChange} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900" placeholder="e.g. The Future of Finance" />
+                    <input required type="text" value={formData.title} onChange={handleTitleChange} className="input-field" placeholder="e.g. The Future of Finance" />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Slug URL</label>
-                    <input required type="text" value={formData.slug} onChange={(e) => setFormData({...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')})} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-gray-50 font-mono text-sm" placeholder="e.g. the-future-of-finance" />
+                    <input required type="text" value={formData.slug} onChange={(e) => setFormData({...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '')})} className="input-field bg-gray-50 font-mono text-sm" placeholder="e.g. the-future-of-finance" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
-                    <select value={formData.author_id} onChange={(e) => setFormData({...formData, author_id: e.target.value})} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white">
+                    <select value={formData.author_id} onChange={(e) => setFormData({...formData, author_id: e.target.value})} className="input-field bg-white">
                       <option value="">Select Author...</option>
                       {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Industry / Category</label>
-                    <select value={formData.industry_id} onChange={(e) => setFormData({...formData, industry_id: e.target.value})} className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white">
+                    <select value={formData.industry_id} onChange={(e) => setFormData({...formData, industry_id: e.target.value})} className="input-field bg-white">
                       <option value="">Select Industry...</option>
                       {industries.map(i => <option key={i.id} value={i.id}>{i.name}</option>)}
                     </select>
@@ -326,16 +326,16 @@ export default function BlogsManager({
                   <label className="text-sm font-medium text-gray-700 mb-1 flex items-center justify-between">
                     <span>Content (Markdown/HTML supported)</span>
                   </label>
-                  <textarea required rows={12} value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 resize-none font-mono text-sm leading-relaxed" placeholder="Write your blog post content here..." />
+                  <textarea required rows={12} value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="input-field resize-none font-mono text-sm leading-relaxed" placeholder="Write your blog post content here..." />
                 </div>
 
-                <div className="flex items-center gap-3 p-4 bg-blue-50/50 rounded-lg border border-blue-100">
+                <div className="flex items-center gap-3 p-4 bg-violet-50/50 rounded-lg border border-violet-100">
                   <input 
                     type="checkbox" 
                     id="is_published"
                     checked={formData.is_published}
                     onChange={(e) => setFormData({...formData, is_published: e.target.checked})}
-                    className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    className="w-5 h-5 text-violet-600 rounded border-gray-300 focus:ring-violet-500"
                   />
                   <div>
                     <label htmlFor="is_published" className="text-sm font-bold text-gray-900 select-none cursor-pointer">
@@ -347,8 +347,8 @@ export default function BlogsManager({
               </div>
 
               <div className="pt-5 pb-2 shrink-0 flex justify-end gap-3 border-t border-gray-100 mt-2">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors">Cancel</button>
-                <button type="submit" disabled={isSubmitting || isUploading} className="px-6 py-2.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors disabled:opacity-50">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-secondary">Cancel</button>
+                <button type="submit" disabled={isSubmitting || isUploading} className="btn btn-primary">
                   {isSubmitting ? "Saving..." : (editingBlog ? "Save Changes" : "Create Blog Post")}
                 </button>
               </div>

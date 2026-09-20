@@ -1,14 +1,26 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { checkAuth } from "@/utils/api-auth";
+import { cacheDel, PUBLIC_JOBS_CACHE_KEY } from "@/utils/redis";
 import { z } from "zod";
 
+const JOB_TYPES = ["Full-Time", "Contract", "Internship"] as const;
+const JOB_EXPERIENCE_LEVELS = ["Fresher", "Mid-Level", "Experienced"] as const;
+
+const slugify = (text: string) =>
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+
 const jobUpdateSchema = z.object({
-  title: z.string().optional(),
-  department: z.string().optional().nullable(),
-  location: z.string().optional().nullable(),
-  type: z.string().optional().nullable(),
-  experience: z.string().optional().nullable(),
+  title: z.string().min(1).optional(),
+  slug: z.string().min(1).optional(),
+  department: z.string().min(1).optional(),
+  location: z.string().min(1).optional(),
+  type: z.enum(JOB_TYPES).optional(),
+  experience: z.enum(JOB_EXPERIENCE_LEVELS).optional(),
   is_active: z.boolean().optional(),
   description: z.string().optional().nullable(),
 });
@@ -82,14 +94,18 @@ export async function GET(
  *             properties:
  *               title:
  *                 type: string
+ *               slug:
+ *                 type: string
  *               department:
  *                 type: string
  *               location:
  *                 type: string
  *               type:
  *                 type: string
+ *                 enum: [Full-Time, Contract, Internship]
  *               experience:
  *                 type: string
+ *                 enum: [Fresher, Mid-Level, Experienced]
  *               is_active:
  *                 type: boolean
  *               description:
@@ -117,23 +133,39 @@ export async function PUT(
     }
     const body = result.data;
     const supabase = await createClient();
-    
+
+    const updates: Record<string, unknown> = {
+      title: body.title,
+      department: body.department,
+      location: body.location,
+      type: body.type,
+      experience: body.experience,
+      is_active: body.is_active,
+      description: body.description,
+    };
+    if (body.slug !== undefined) {
+      const slug = slugify(body.slug);
+      if (!slug) {
+        return NextResponse.json({ error: "Could not derive a valid slug" }, { status: 400 });
+      }
+      updates.slug = slug;
+    }
+
     const { data, error } = await supabase
       .from('job_posts')
-      .update({
-        title: body.title,
-        department: body.department,
-        location: body.location,
-        type: body.type,
-        experience: body.experience,
-        is_active: body.is_active,
-        description: body.description,
-      })
+      .update(updates)
       .eq('id', id)
       .select();
-      
-    if (error) throw error;
-    
+
+    if (error) {
+      if (error.code === '23505') {
+        return NextResponse.json({ error: "A job with this slug already exists" }, { status: 400 });
+      }
+      throw error;
+    }
+
+    await cacheDel(PUBLIC_JOBS_CACHE_KEY); // status/slug/etc. may have changed — don't serve a stale public list
+
     return NextResponse.json(data[0]);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -178,7 +210,9 @@ export async function DELETE(
       .eq('id', id);
       
     if (error) throw error;
-    
+
+    await cacheDel(PUBLIC_JOBS_CACHE_KEY);
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

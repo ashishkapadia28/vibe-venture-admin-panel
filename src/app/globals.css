@@ -1,13 +1,33 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9fafb;
+  color-scheme: light;
+
+  --background: #f6f5fb;
   --foreground: #111827;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
+
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
+  --primary-foreground: #ffffff;
+  --primary-soft: #ede9fe;
+
   --card: #ffffff;
   --card-foreground: #111827;
-  --border: #e5e7eb;
+
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
+
+  --border: #e9e8f0;
+  --ring: #8b5cf6;
+
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+
+  --radius: 1rem;
 }
 
 @theme inline {
@@ -15,16 +35,248 @@
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+html {
+  color-scheme: light;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Keep native controls (checkboxes, selects, date pickers) on the light
+   palette even when the OS/browser prefers dark, so their text never
+   disappears against our light cards. */
+input,
+select,
+textarea {
+  color-scheme: light;
+}
+
+::selection {
+  background: var(--primary-soft);
+  color: var(--primary-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Slim, on-brand scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d8d3ea transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: #d8d3ea;
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #b9b0dd;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* ---------------------------------------------------------------- */
+/* Reusable UI primitives — one definition, used across every page   */
+/* ---------------------------------------------------------------- */
+@layer components {
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    box-shadow: 0 1px 2px rgba(17, 24, 39, 0.04), 0 8px 24px -12px rgba(17, 24, 39, 0.06);
+    overflow: hidden;
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.03);
+  }
+
+  .thead-row {
+    border-bottom: 1px solid var(--border);
+    background: var(--muted);
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1.1rem;
+    transition: all 150ms ease;
+    white-space: nowrap;
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: var(--primary-foreground);
+    box-shadow: 0 4px 14px -4px rgba(124, 58, 237, 0.45);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    box-shadow: 0 6px 18px -4px rgba(124, 58, 237, 0.55);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: var(--muted);
+    color: #4b5563;
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background: #e5e7eb;
+  }
+  .btn-danger {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+  .btn-danger:hover:not(:disabled) {
+    background: #fecaca;
+  }
+
+  .icon-btn {
+    padding: 0.5rem;
+    border-radius: 0.65rem;
+    color: #9ca3af;
+    transition: all 150ms ease;
+  }
+  .icon-btn:hover {
+    color: var(--primary);
+    background: var(--primary-soft);
+  }
+  .icon-btn-danger {
+    padding: 0.5rem;
+    border-radius: 0.65rem;
+    color: #9ca3af;
+    transition: all 150ms ease;
+  }
+  .icon-btn-danger:hover {
+    color: var(--danger);
+    background: var(--danger-soft);
+  }
+
+  .input-field {
+    width: 100%;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    color: var(--foreground);
+    background: #fff;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+  .input-field:focus {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 999px;
+  }
+  .badge-primary { background: var(--primary-soft); color: var(--primary-hover); }
+  .badge-success { background: var(--success-soft); color: #15803d; }
+  .badge-warning { background: var(--warning-soft); color: #b45309; }
+  .badge-danger { background: var(--danger-soft); color: #b91c1c; }
+  .badge-neutral { background: var(--muted); color: var(--muted-foreground); }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    padding: 1rem;
+  }
+  .modal-panel {
+    background: #fff;
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 50px -12px rgba(17, 24, 39, 0.35);
+  }
+
+  .empty-state {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--muted-foreground);
+  }
+
+  .hover-lift {
+    transition: transform 250ms ease, box-shadow 250ms ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/* Minimal "animate-in" system (subset of tailwindcss-animate) so    */
+/* existing animate-in / fade-in / zoom-in-95 / slide-in-from-*      */
+/* utilities used across the app actually run.                      */
+/* ---------------------------------------------------------------- */
+@layer utilities {
+  .animate-in {
+    animation-name: enter;
+    animation-duration: 150ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+  .fade-in { --tw-enter-opacity: 0; }
+  .zoom-in-95 { --tw-enter-scale: 0.95; }
+  .slide-in-from-top-2 { --tw-enter-translate-y: -0.5rem; }
+  .slide-in-from-top-4 { --tw-enter-translate-y: -1rem; }
+  .slide-in-from-bottom-4 { --tw-enter-translate-y: 1rem; }
+  .duration-200 { animation-duration: 200ms; }
+  .duration-300 { animation-duration: 300ms; }
+  .duration-500 { animation-duration: 500ms; }
+}
+
+@keyframes enter {
+  from {
+    opacity: var(--tw-enter-opacity, 1);
+    transform: translate3d(var(--tw-enter-translate-x, 0), var(--tw-enter-translate-y, 0), 0)
+      scale3d(var(--tw-enter-scale, 1), var(--tw-enter-scale, 1), 1);
+  }
+}

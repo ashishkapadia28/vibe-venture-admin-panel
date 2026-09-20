@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Users, CheckCircle, Award, ExternalLink, User, X } from "lucide-react";
+import { ArrowLeft, Users, CheckCircle, Award, ExternalLink, User, X, FileText, Download } from "lucide-react";
 import Link from "next/link";
 import StatCard from "@/components/StatCard";
 
@@ -32,10 +32,17 @@ interface Applicant {
   phone: string;
   linkedin: string;
   experience: string;
-  cover_letter: string;
+  cover_letter?: string | null; // legacy free-text field, kept for old rows
+  resume_path?: string | null;
+  cover_letter_path?: string | null;
+  resume_url?: string | null; // short-lived signed URL, generated per-request
+  cover_letter_url?: string | null;
   status: string;
   created_at: string;
+  ip_address?: string | null;
 }
+
+const APPLICATION_STATUSES = ["In Review", "Shortlisted", "Selected", "Rejected"] as const;
 
 export default function JobDetailsPage() {
   const { id } = useParams() as { id: string };
@@ -43,6 +50,7 @@ export default function JobDetailsPage() {
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const [applicants, setApplicants] = useState<Applicant[]>([]);
 
@@ -70,6 +78,25 @@ export default function JobDetailsPage() {
     fetchData();
   }, [id]);
 
+  const updateApplicantStatus = async (applicantId: string, status: string) => {
+    setIsUpdatingStatus(true);
+    try {
+      const res = await fetch(`/api/applications/${applicantId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error('Failed to update status');
+      setApplicants((prev) => prev.map((a) => (a.id === applicantId ? { ...a, status } : a)));
+      setSelectedApplicant((prev) => (prev && prev.id === applicantId ? { ...prev, status } : prev));
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update application status.');
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
   const totalApplications = applicants.length;
   const shortlisted = applicants.filter(a => a.status === "Shortlisted").length;
   const selected = applicants.filter(a => a.status === "Selected").length;
@@ -91,7 +118,7 @@ export default function JobDetailsPage() {
         <header>
           <button 
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-gray-500 hover:text-blue-600 font-medium mb-4 transition-colors"
+            className="flex items-center gap-2 text-gray-500 hover:text-violet-600 font-medium mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Jobs
@@ -101,7 +128,7 @@ export default function JobDetailsPage() {
               <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">{job.title}</h1>
               <p className="text-gray-500">{job.department} • {job.location} • {job.type}</p>
             </div>
-            <span className={`px-4 py-2 text-sm rounded-full font-medium ${job.is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}>
+            <span className={`badge text-sm px-4 py-2 ${job.is_active ? 'badge-primary' : 'badge-neutral'}`}>
               {job.is_active ? "Currently Accepting Applications" : "Hidden / Closed"}
             </span>
           </div>
@@ -117,11 +144,11 @@ export default function JobDetailsPage() {
         {/* Applicants History Table */}
         <div className="pt-4">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Applicant History</h2>
-          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+          <div className="panel">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50 text-gray-500 text-sm tracking-wider uppercase">
+                  <tr className="thead-row">
                     <th className="px-6 py-4 font-medium">Applicant Name</th>
                     <th className="px-6 py-4 font-medium">Email</th>
                     <th className="px-6 py-4 font-medium">Phone</th>
@@ -130,42 +157,53 @@ export default function JobDetailsPage() {
                     <th className="px-6 py-4 font-medium text-right">Links & Profile</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-100">
                   {applicants.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan={6} className="empty-state">
                         No applications received yet.
                       </td>
                     </tr>
                   ) : (
                     applicants.map((applicant) => (
-                      <tr key={applicant.id} className="hover:bg-gray-50 transition-colors group">
+                      <tr key={applicant.id} className="hover:bg-violet-50/30 transition-colors group">
                         <td className="px-6 py-4 text-gray-900 font-medium">{applicant.name}</td>
                         <td className="px-6 py-4 text-gray-600">
-                          <a href={`mailto:${applicant.email}`} className="text-blue-600 hover:underline" title="Send Email">{applicant.email}</a>
+                          <a href={`mailto:${applicant.email}`} className="text-violet-600 hover:underline" title="Send Email">{applicant.email}</a>
                         </td>
                         <td className="px-6 py-4 text-gray-600">
-                          <a href={`tel:${applicant.phone}`} className="text-blue-600 hover:underline" title="Call Phone">{applicant.phone}</a>
+                          <a href={`tel:${applicant.phone}`} className="text-violet-600 hover:underline" title="Call Phone">{applicant.phone}</a>
                         </td>
                         <td className="px-6 py-4 text-gray-600">{formatDate(applicant.created_at)}</td>
                         <td className="px-6 py-4">
-                          <span
-                            className={`px-3 py-1 text-xs rounded-full font-medium ${
-                              applicant.status === "Selected" ? "bg-emerald-100 text-emerald-700" :
-                              applicant.status === "Shortlisted" ? "bg-blue-100 text-blue-700" :
-                              applicant.status === "In Review" ? "bg-amber-100 text-amber-700" :
-                              "bg-red-100 text-red-700"
+                          <select
+                            value={applicant.status}
+                            disabled={isUpdatingStatus}
+                            onChange={(e) => updateApplicantStatus(applicant.id, e.target.value)}
+                            onClick={(e) => e.stopPropagation()}
+                            className={`badge border-0 cursor-pointer disabled:opacity-50 ${
+                              applicant.status === "Selected" ? "badge-primary" :
+                              applicant.status === "Shortlisted" ? "badge-primary" :
+                              applicant.status === "In Review" ? "badge-warning" :
+                              "badge-danger"
                             }`}
                           >
-                            {applicant.status}
-                          </span>
+                            {APPLICATION_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                          </select>
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex justify-end items-center gap-3">
-                            <Link href={applicant.linkedin} target="_blank" rel="noopener noreferrer" className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View LinkedIn">
-                              <LinkedinIcon className="w-4 h-4" />
-                            </Link>
-                            <button onClick={() => setSelectedApplicant(applicant)} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Profile">
+                            {applicant.resume_url && (
+                              <Link href={applicant.resume_url} target="_blank" rel="noopener noreferrer" className="icon-btn" title="Download Resume">
+                                <FileText className="w-4 h-4" />
+                              </Link>
+                            )}
+                            {applicant.linkedin && (
+                              <Link href={applicant.linkedin} target="_blank" rel="noopener noreferrer" className="icon-btn" title="View LinkedIn">
+                                <LinkedinIcon className="w-4 h-4" />
+                              </Link>
+                            )}
+                            <button onClick={() => setSelectedApplicant(applicant)} className="icon-btn" title="View Profile">
                               <User className="w-5 h-5" />
                             </button>
                           </div>
@@ -183,8 +221,8 @@ export default function JobDetailsPage() {
 
       {/* Profile Modal */}
       {selectedApplicant && (
-        <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
+        <div className="modal-overlay">
+          <div className="modal-panel w-full max-w-lg p-6 relative animate-in zoom-in-95 duration-200">
             <button 
               onClick={() => setSelectedApplicant(null)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -192,7 +230,7 @@ export default function JobDetailsPage() {
               <X className="w-5 h-5" />
             </button>
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl font-bold">
+              <div className="w-16 h-16 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center text-2xl font-bold">
                 {selectedApplicant.name.charAt(0)}
               </div>
               <div>
@@ -205,11 +243,11 @@ export default function JobDetailsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">Email</label>
-                  <a href={`mailto:${selectedApplicant.email}`} className="text-blue-600 hover:underline font-medium block truncate" title="Send Email">{selectedApplicant.email}</a>
+                  <a href={`mailto:${selectedApplicant.email}`} className="text-violet-600 hover:underline font-medium block truncate" title="Send Email">{selectedApplicant.email}</a>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">Phone</label>
-                  <a href={`tel:${selectedApplicant.phone}`} className="text-blue-600 hover:underline font-medium block" title="Call">{selectedApplicant.phone}</a>
+                  <a href={`tel:${selectedApplicant.phone}`} className="text-violet-600 hover:underline font-medium block" title="Call">{selectedApplicant.phone}</a>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -219,26 +257,76 @@ export default function JobDetailsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">Status</label>
-                  <p className="text-gray-900 font-medium">{selectedApplicant.status}</p>
+                  <select
+                    value={selectedApplicant.status}
+                    disabled={isUpdatingStatus}
+                    onChange={(e) => updateApplicantStatus(selectedApplicant.id, e.target.value)}
+                    className="input-field py-1.5 text-sm font-medium disabled:opacity-50"
+                  >
+                    {APPLICATION_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                  </select>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-500 mb-1">Cover Letter / Notes</label>
-                <div className="p-4 bg-gray-50 rounded-lg text-gray-700 text-sm whitespace-pre-wrap">
-                  {selectedApplicant.cover_letter || "No cover letter provided."}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-1">Resume</label>
+                  {selectedApplicant.resume_url ? (
+                    <Link
+                      href={selectedApplicant.resume_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-violet-600 bg-violet-50 hover:bg-violet-100 rounded-lg transition-colors"
+                    >
+                      <Download className="w-4 h-4" /> Download PDF
+                    </Link>
+                  ) : (
+                    <p className="text-sm text-gray-400">Not provided</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-1">Cover Letter</label>
+                  {selectedApplicant.cover_letter_url ? (
+                    <Link
+                      href={selectedApplicant.cover_letter_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-violet-600 bg-violet-50 hover:bg-violet-100 rounded-lg transition-colors"
+                    >
+                      <Download className="w-4 h-4" /> Download PDF
+                    </Link>
+                  ) : (
+                    <p className="text-sm text-gray-400">Not provided</p>
+                  )}
                 </div>
               </div>
-              <div className="pt-4 flex justify-end gap-3">
-                <Link 
-                  href={selectedApplicant.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg font-medium transition-colors"
-                >
-                  <LinkedinIcon className="w-4 h-4" />
-                  Visit LinkedIn
-                </Link>
+              {selectedApplicant.cover_letter && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-500 mb-1">Notes (legacy text submission)</label>
+                  <div className="p-4 bg-gray-50 rounded-lg text-gray-700 text-sm whitespace-pre-wrap">
+                    {selectedApplicant.cover_letter}
+                  </div>
+                </div>
+              )}
+              <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
+                <span>Privacy-policy consent recorded at submission</span>
+                <span className="font-mono">
+                  {new Date(selectedApplicant.created_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                  {selectedApplicant.ip_address ? ` · ${selectedApplicant.ip_address}` : ""}
+                </span>
               </div>
+              {selectedApplicant.linkedin && (
+                <div className="pt-4 flex justify-end gap-3">
+                  <Link
+                    href={selectedApplicant.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 text-violet-600 bg-violet-50 hover:bg-violet-100 rounded-lg font-medium transition-colors"
+                  >
+                    <LinkedinIcon className="w-4 h-4" />
+                    Visit LinkedIn
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

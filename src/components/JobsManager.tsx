@@ -4,8 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Edit2, Trash2, Eye, EyeOff, X, ChevronRight } from "lucide-react";
 
+const JOB_TYPES = ["Full-Time", "Contract", "Internship"] as const;
+const JOB_EXPERIENCE_LEVELS = ["Fresher", "Mid-Level", "Experienced"] as const;
+
 interface Job {
   id: string;
+  slug: string;
   title: string;
   department: string;
   location: string;
@@ -15,20 +19,24 @@ interface Job {
   description?: string;
 }
 
+const slugify = (text: string) =>
+  text.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
+
 export default function JobsManager() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<Job | null>(null);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     department: "",
     location: "",
-    type: "Full-Time",
+    type: "Full-Time" as string,
     experience: "",
   });
 
@@ -75,7 +83,7 @@ export default function JobsManager() {
 
   const openAddModal = () => {
     setEditingJob(null);
-    setFormData({ title: "", department: "", location: "", type: "Full-Time", experience: "" });
+    setFormData({ title: "", slug: "", department: "", location: "", type: "Full-Time", experience: "" });
     setIsModalOpen(true);
   };
 
@@ -83,12 +91,25 @@ export default function JobsManager() {
     setEditingJob(job);
     setFormData({
       title: job.title,
+      slug: job.slug || "",
       department: job.department,
       location: job.location,
       type: job.type,
       experience: job.experience,
     });
     setIsModalOpen(true);
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const title = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      title,
+      // Only auto-follow the title for brand-new jobs — once a job exists
+      // (or the admin has hand-edited the slug) its public URL shouldn't
+      // silently change out from under it.
+      slug: !editingJob ? slugify(title) : prev.slug,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -129,9 +150,9 @@ export default function JobsManager() {
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">Job Posts</h1>
           <p className="text-gray-500">Manage careers, job postings, and active listings.</p>
         </div>
-        <button 
+        <button
           onClick={openAddModal}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm"
+          className="btn btn-primary"
         >
           <Plus className="w-5 h-5" />
           Add New Job
@@ -139,11 +160,11 @@ export default function JobsManager() {
       </header>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="panel hover-lift">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50 text-gray-500 text-sm tracking-wider uppercase">
+              <tr className="thead-row">
                 <th className="px-6 py-4 font-medium">Title</th>
                 <th className="px-6 py-4 font-medium">Department</th>
                 <th className="px-6 py-4 font-medium">Location</th>
@@ -152,53 +173,54 @@ export default function JobsManager() {
                 <th className="px-6 py-4 font-medium text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-100">
               {loading ? (
-                <tr><td colSpan={6} className="p-12 text-center text-gray-500">Loading jobs...</td></tr>
+                <tr><td colSpan={6} className="empty-state">Loading jobs...</td></tr>
               ) : jobs.length === 0 ? (
-                <tr><td colSpan={6} className="p-12 text-center text-gray-500">No job posts found. Click &quot;Add New Job&quot; to create one.</td></tr>
+                <tr><td colSpan={6} className="empty-state">No job posts found. Click &quot;Add New Job&quot; to create one.</td></tr>
               ) : (
                 jobs.map((job) => (
-                  <tr key={job.id} className="hover:bg-gray-50 transition-colors group">
-                    <td className="px-6 py-4 text-gray-900 font-medium">{job.title}</td>
+                  <tr key={job.id} className="hover:bg-violet-50/30 transition-colors group">
+                    <td className="px-6 py-4">
+                      <p className="text-gray-900 font-medium">{job.title}</p>
+                      <p className="text-gray-500 text-xs mt-1">/career/{job.slug}</p>
+                    </td>
                     <td className="px-6 py-4 text-gray-600">{job.department}</td>
                     <td className="px-6 py-4 text-gray-600">{job.location}</td>
                     <td className="px-6 py-4 text-gray-600">{job.type}</td>
                     <td className="px-6 py-4">
                       <span
-                        className={`px-3 py-1 text-xs rounded-full font-medium ${
-                          job.is_active ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
-                        }`}
+                        className={`badge ${job.is_active ? "badge-primary" : "badge-neutral"}`}
                       >
                         {job.is_active ? "Active" : "Hidden"}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
+                        <button
                           onClick={() => toggleStatus(job)}
-                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="icon-btn"
                           title={job.is_active ? "Hide Job" : "Publish Job"}
                         >
                           {job.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
-                        <button 
+                        <button
                           onClick={() => openEditModal(job)}
-                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="icon-btn"
                           title="Edit Job"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => deleteJob(job.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="icon-btn-danger"
                           title="Delete Job"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
-                        <Link 
+                        <Link
                           href={`/jobs/${job.id}`}
-                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="icon-btn"
                           title="View Details"
                         >
                           <ChevronRight className="w-4 h-4" />
@@ -215,8 +237,8 @@ export default function JobsManager() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
+        <div className="modal-overlay">
+          <div className="modal-panel w-full max-w-lg p-6 relative animate-in zoom-in-95 duration-200">
             <button 
               onClick={() => setIsModalOpen(false)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -229,14 +251,26 @@ export default function JobsManager() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Job Title</label>
-                <input 
+                <input
                   required
-                  type="text" 
+                  type="text"
                   value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                  onChange={handleTitleChange}
+                  className="input-field"
                   placeholder="e.g. Senior Go Engineer"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Slug (public URL)</label>
+                <input
+                  required
+                  type="text"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") })}
+                  className="input-field bg-gray-50 font-mono text-sm"
+                  placeholder="e.g. senior-go-engineer"
+                />
+                <p className="text-xs text-gray-500 mt-1">Shown as /career/{formData.slug || "..."} and used to match applications to this job.</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -246,7 +280,7 @@ export default function JobsManager() {
                     type="text" 
                     value={formData.department}
                     onChange={(e) => setFormData({...formData, department: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="input-field"
                     placeholder="e.g. Engineering"
                   />
                 </div>
@@ -257,7 +291,7 @@ export default function JobsManager() {
                     type="text" 
                     value={formData.location}
                     onChange={(e) => setFormData({...formData, location: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="input-field"
                     placeholder="e.g. Remote"
                   />
                 </div>
@@ -265,40 +299,39 @@ export default function JobsManager() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <select 
+                  <select
+                    required
                     value={formData.type}
                     onChange={(e) => setFormData({...formData, type: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="input-field"
                   >
-                    <option value="Full-Time">Full-Time</option>
-                    <option value="Part-Time">Part-Time</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Internship">Internship</option>
+                    {JOB_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Experience</label>
-                  <input 
+                  <select
                     required
-                    type="text" 
                     value={formData.experience}
                     onChange={(e) => setFormData({...formData, experience: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                    placeholder="e.g. 3+ Years"
-                  />
+                    className="input-field"
+                  >
+                    <option value="" disabled>Select level...</option>
+                    {JOB_EXPERIENCE_LEVELS.map((lvl) => <option key={lvl} value={lvl}>{lvl}</option>)}
+                  </select>
                 </div>
               </div>
               <div className="pt-4 flex justify-end gap-3">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+                  className="btn btn-secondary"
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
-                  className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition-colors"
+                <button
+                  type="submit"
+                  className="btn btn-primary"
                 >
                   {editingJob ? "Save Changes" : "Create Job"}
                 </button>

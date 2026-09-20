@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { checkAuth } from "@/utils/api-auth";
-import { verifyTurnstileToken } from "@/utils/turnstile";
 import { z } from "zod";
 
 const inquirySchema = z.object({
@@ -11,7 +10,6 @@ const inquirySchema = z.object({
   industry: z.string().optional().nullable(),
   service: z.string().optional().nullable(),
   project_info: z.string().min(1, "Project info is required"),
-  cf_turnstile_response: z.string().min(1, "Captcha token is required").optional(),
 });
 
 /**
@@ -28,7 +26,7 @@ const inquirySchema = z.object({
  *       500:
  *         description: Internal server error
  */
-export async function GET(request: Request) {
+export async function GET() {
   const authError = await checkAuth();
   if (authError) return authError;
 
@@ -43,8 +41,8 @@ export async function GET(request: Request) {
     if (error) throw error;
     
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
@@ -66,7 +64,6 @@ export async function GET(request: Request) {
  *               - name
  *               - email
  *               - project_info
- *               - cf_turnstile_response
  *             properties:
  *               name:
  *                 type: string
@@ -79,8 +76,6 @@ export async function GET(request: Request) {
  *               service:
  *                 type: string
  *               project_info:
- *                 type: string
- *               cf_turnstile_response:
  *                 type: string
  *     responses:
  *       201:
@@ -98,20 +93,9 @@ export async function POST(request: Request) {
     }
     const body = result.data;
 
-    // Verify Turnstile Token
-    if (body.cf_turnstile_response) {
-      const isValid = await verifyTurnstileToken(body.cf_turnstile_response);
-      if (!isValid) {
-        return NextResponse.json({ error: "Captcha verification failed. Please try again." }, { status: 400 });
-      }
-    } else {
-      // In production, you might want to strictly require this field:
-      // return NextResponse.json({ error: "Captcha token is missing." }, { status: 400 });
-    }
-
     const supabase = await createClient();
     
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('inquiries')
       .insert([
         {
@@ -128,8 +112,8 @@ export async function POST(request: Request) {
     if (error) throw error;
     
     return NextResponse.json({ success: true, message: "Inquiry submitted successfully" }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 

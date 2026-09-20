@@ -9,7 +9,6 @@ import NotificationsDropdown from "./NotificationsDropdown";
 const routeTitles: Record<string, string> = {
   "/": "Dashboard",
   "/services": "Services Management",
-  "/industries": "Industries",
   "/blogs": "Blog Posts",
   "/authors": "Authors",
   "/case-studies": "Case Studies",
@@ -39,7 +38,7 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
 
   useEffect(() => {
     async function fetchMaintenanceStatus() {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("site_settings")
         .select("maintenance_mode")
         .eq("id", "global")
@@ -71,7 +70,7 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
   };
 
   return (
-    <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 sm:px-8 shrink-0">
+    <header className="h-20 bg-white/70 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 sm:px-8 shrink-0 relative z-20">
       <div className="flex items-center gap-3">
         <button 
           onClick={onMenuClick}
@@ -82,14 +81,14 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
         <h2 className="text-xl font-bold text-gray-900 hidden sm:block">{title}</h2>
       </div>
       
-      <div className="flex items-center gap-4 sm:gap-6">
+      <div className="flex items-center gap-3 sm:gap-5">
         {/* Maintenance Toggle */}
-        <div className="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-full border border-amber-100">
+        <div className="flex items-center gap-3 bg-amber-50 px-4 py-2 rounded-full border border-amber-100 shadow-sm hover-lift">
           <div className="flex items-center gap-2 text-amber-700 font-medium text-sm">
             <AlertTriangle className="w-4 h-4" />
             <span className="hidden sm:inline">Maintenance Mode</span>
           </div>
-          <button 
+          <button
             onClick={toggleMaintenance}
             disabled={isLoading}
             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 ${isMaintenance ? 'bg-amber-600' : 'bg-gray-300'}`}
@@ -102,12 +101,12 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
         <NotificationsDropdown />
 
         {/* User Profile */}
-        <div className="flex items-center gap-3 cursor-pointer pl-4 sm:pl-6 border-l border-gray-200">
+        <div className="flex items-center gap-3 cursor-pointer pl-3 sm:pl-5 border-l border-gray-200">
           <div className="hidden sm:flex flex-col items-end">
             <span className="text-sm font-semibold text-gray-900 leading-tight">Admin User</span>
             <span className="text-xs text-gray-500">Administrator</span>
           </div>
-          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+          <div className="w-10 h-10 rounded-full bg-linear-to-br from-violet-500 to-violet-700 flex items-center justify-center text-white font-bold text-sm shadow-[0_4px_14px_-4px_rgba(124,58,237,0.55)] hover-lift">
             AU
           </div>
         </div>

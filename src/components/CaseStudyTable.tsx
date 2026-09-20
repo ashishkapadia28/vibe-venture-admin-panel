@@ -40,18 +40,18 @@ interface CaseStudyTableProps {
 export default function CaseStudyTable({ caseStudies, onEdit, onDelete, isLoading = false }: CaseStudyTableProps) {
   if (isLoading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm p-12 text-center text-gray-500">
+      <div className="panel empty-state">
         Loading case studies...
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+    <div className="panel hover-lift">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-gray-200 bg-gray-50 text-gray-500 text-sm tracking-wider uppercase">
+            <tr className="thead-row">
               <th className="px-6 py-4 font-medium">Title</th>
               <th className="px-6 py-4 font-medium">Tag</th>
               <th className="px-6 py-4 font-medium">Tech Stack</th>
@@ -59,9 +59,9 @@ export default function CaseStudyTable({ caseStudies, onEdit, onDelete, isLoadin
               <th className="px-6 py-4 font-medium text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-100">
             {caseStudies.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50 transition-colors group">
+              <tr key={item.id} className="hover:bg-violet-50/30 transition-colors group">
                 <td className="px-6 py-4 text-gray-900 font-medium">
                   <div className="flex items-center gap-3">
                     {item.image && (
@@ -86,10 +86,10 @@ export default function CaseStudyTable({ caseStudies, onEdit, onDelete, isLoadin
                 </td>
                 <td className="px-6 py-4">
                   <span
-                    className={`px-3 py-1 text-xs rounded-full font-medium ${
+                    className={`badge ${
                       item.is_published
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-amber-100 text-amber-700"
+                        ? "badge-primary"
+                        : "badge-warning"
                     }`}
                   >
                     {item.is_published ? "Published" : "Draft"}
@@ -97,20 +97,20 @@ export default function CaseStudyTable({ caseStudies, onEdit, onDelete, isLoadin
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
+                    <button
                       onClick={() => onEdit(item)}
-                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      className="icon-btn"
                       title="Edit Case Study"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         if (window.confirm("Are you sure you want to delete this case study?")) {
                           onDelete(item.id);
                         }
                       }}
-                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      className="icon-btn-danger"
                       title="Delete Case Study"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -124,7 +124,7 @@ export default function CaseStudyTable({ caseStudies, onEdit, onDelete, isLoadin
       </div>
       
       {caseStudies.length === 0 && (
-        <div className="p-12 text-center text-gray-500">
+        <div className="empty-state">
           No case studies found. Create your first one!
         </div>
       )}

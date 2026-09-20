@@ -28,7 +28,9 @@ export default async function ServicesPage() {
 
   return (
     <div className="flex-1 p-4 sm:p-8 overflow-y-auto">
-      <ServicesManager initialServices={services || []} />
+      <div className="max-w-7xl mx-auto">
+        <ServicesManager initialServices={services || []} />
+      </div>
     </div>
   );
 }
